@@ -8,13 +8,27 @@
 using namespace std;
 
 class Equipment{
-	int hpmax;
-	int atk;
-	int def;
-	public:
-		Equipment(int,int,int);
-		vector<int> getStat();			
+    int hpmax;
+    int atk;
+    int def;
+    public:
+        vector<int> getStat();
+        Equipment(int,int,int);
 };
+
+Equipment::Equipment(int a,int b,int c){
+    hpmax = a;	
+    atk = b;	
+    def = c;
+}
+
+vector<int> Equipment::getStat(){
+	vector<int> stat;
+	stat.push_back(hpmax);
+	stat.push_back(atk);
+	stat.push_back(def);
+	return stat;
+}
 
 class Unit{
 		string name;
@@ -40,6 +54,27 @@ class Unit{
 		void equip(Equipment *);  
 };
 
+void Unit::equip(Equipment *item){
+	if(equipment != 0){
+		vector <int> stat_old = equipment->getStat();
+		hpmax-=stat_old[0];
+		atk-=stat_old[1];
+		def-=stat_old[2];
+		if(hp >hpmax){
+			hp = hpmax ;
+		}
+	}
+	vector <int> stat = item->getStat();
+	hpmax+=stat[0];
+	atk+=stat[1];
+	def+=stat[2];
+	equipment = item;
+}
+
+void Unit::dodge(){
+	dodge_on = true;
+}
+
 Unit::Unit(string t,string n){ 
 	type = t;
 	name = n;
@@ -52,9 +87,9 @@ Unit::Unit(string t,string n){
 		atk = rand()%5+25;
 		def = rand()%3+5;
 	}
-	hp = hpmax;		
-	dodge_on = false;
+	hp = hpmax;	
 	guard_on = false;
+	dodge_on = false;
 	equipment = NULL;
 }
 
@@ -75,11 +110,7 @@ void Unit::showStatus(){
 
 void Unit::newTurn(){
 	guard_on = false; 
-	dodge_on = false; 
-}
-
-void Unit::dodge(){
-	dodge_on = true;
+	dodge_on = false;
 }
 
 int Unit::beAttacked(int oppatk){
@@ -98,12 +129,12 @@ int Unit::beAttacked(int oppatk){
 	return dmg;	
 }
 
-int Unit::ultimateAttack(Unit &opp){
-    return opp.beAttacked(2*atk);
-}
-
 int Unit::attack(Unit &opp){
 	return opp.beAttacked(atk);
+}
+
+int Unit::ultimateAttack(Unit &opp){
+	return opp.beAttacked(2*atk);
 }
 
 int Unit::heal(){
